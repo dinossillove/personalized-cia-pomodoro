@@ -1,0 +1,41 @@
+/* Mengambil Font Aesthetic dari Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Quicksand:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.bg-gingham {
+  background-color: #fce7f3;
+  background-image: 
+    linear-gradient(90deg, rgba(244, 114, 182, 0.15) 50%, transparent 50%),
+    linear-gradient(rgba(244, 114, 182, 0.15) 50%, transparent 50%);
+  background-size: 50px 50px;
+}
+
+.font-caveat { font-family: 'Caveat', cursive; }
+.font-quicksand { font-family: 'Quicksand', sans-serif; }
+
+.scrapbook-shadow {
+  box-shadow: 6px 6px 0px rgba(244, 114, 182, 0.4);
+}
+.scrapbook-shadow-green {
+  box-shadow: 6px 6px 0px rgba(134, 239, 172, 0.5);
+}
+
+.washi-tape {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 80px;
+  height: 25px;
+  background-color: rgba(253, 164, 175, 0.6);
+  border-radius: 2px;
+  z-index: 10;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+}
+.washi-tape-green { 
+  background-color: rgba(167, 243, 208, 0.6); 
+  transform: translateX(-50%) rotate(3deg); 
+}
