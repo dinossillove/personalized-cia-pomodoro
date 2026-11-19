@@ -72,12 +72,3 @@ npm run dev
 - Frontend berjalan di: `http://localhost:5173`
 - Backend API Express berjalan di: `http://localhost:5000`
 
----
-
-## 📸 Checklist Screenshot untuk Pengumpulan Tugas
-1. **Screenshot Tampilan Awal (Read):** Halaman utama menampilkan daftar tugas dari database MySQL.
-2. **Screenshot Tambah Tugas (Create):** Mengisi form tambah tugas baru dan data langsung muncul di tabel/list.
-3. **Screenshot Edit Tugas (Update):** Modal edit tugas terbuka dan data berhasil diubah (misal status atau judul).
-4. **Screenshot Hapus Tugas (Delete):** Konfirmasi dialog hapus tugas dan data terhapus.
-5. **Screenshot Database Laragon / HeidiSQL:** Tabel `tasks` di database `paw_task_tracker` yang menunjukkan data tersimpan.
-6. **Screenshot Terminal / Console:** Menampilkan log Express server `http://localhost:5000` dan status koneksi database.
