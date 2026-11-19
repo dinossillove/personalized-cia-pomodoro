@@ -230,11 +230,12 @@ export default function App() {
 
         {/* Kotak Utama Konten Kiri */}
         <div className="flex-1 min-h-[520px] lg:min-h-[calc(100vh-3rem)] bg-[#fffaf0]/95 backdrop-blur-sm rounded-[1.5rem] sm:rounded-[2rem] border-4 border-dashed border-pink-300 scrapbook-shadow p-3 sm:p-6 flex items-stretch sm:items-center justify-center relative overflow-visible">
-          {activeTab === 'pomodoro' ? (
+          <div className={`w-full flex items-center justify-center ${activeTab === 'pomodoro' ? '' : 'hidden'}`}>
             <PomodoroTimer topTask={pomodoroTask} onCompleteTask={handleCompleteTask} />
-          ) : (
+          </div>
+          <div className={`w-full h-full ${activeTab === 'activities' ? '' : 'hidden'}`}>
             <ActiveActivities />
-          )}
+          </div>
         </div>
       </div>
 

@@ -10,6 +10,15 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+let isDbInitialized = false;
+
+async function ensureDbReady() {
+  if (!isDbInitialized) {
+    await initDatabase();
+    isDbInitialized = true;
+  }
+}
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -25,6 +34,7 @@ app.use(express.static(path.join(__dirname, 'dist')));
 // 1. READ ALL - Ambil semua daftar tugas
 app.get('/api/tasks', async (req, res) => {
   try {
+    await ensureDbReady();
     const pool = getPool();
     const [rows] = await pool.query('SELECT * FROM tasks ORDER BY date ASC');
     res.json({
@@ -33,10 +43,10 @@ app.get('/api/tasks', async (req, res) => {
       data: rows,
     });
   } catch (error) {
-    console.error('Error GET /api/tasks:', error);
+    console.error('Error GET /api/tasks:', error.message);
     res.status(500).json({
       success: false,
-      message: 'Gagal mengambil data tugas dari database',
+      message: 'Gagal mengambil data tugas dari database MySQL. Pastikan MySQL Laragon aktif.',
       error: error.message,
     });
   }
@@ -46,6 +56,7 @@ app.get('/api/tasks', async (req, res) => {
 app.get('/api/tasks/:id', async (req, res) => {
   const { id } = req.params;
   try {
+    await ensureDbReady();
     const pool = getPool();
     const [rows] = await pool.query('SELECT * FROM tasks WHERE id = ?', [id]);
     if (rows.length === 0) {
@@ -59,7 +70,7 @@ app.get('/api/tasks/:id', async (req, res) => {
       data: rows[0],
     });
   } catch (error) {
-    console.error(`Error GET /api/tasks/${id}:`, error);
+    console.error(`Error GET /api/tasks/${id}:`, error.message);
     res.status(500).json({
       success: false,
       message: 'Gagal mengambil data tugas',
@@ -72,7 +83,6 @@ app.get('/api/tasks/:id', async (req, res) => {
 app.post('/api/tasks', async (req, res) => {
   const { title, date, category, type, status } = req.body;
 
-  // Validasi input sederhana
   if (!title || !date || !category) {
     return res.status(400).json({
       success: false,
@@ -81,11 +91,11 @@ app.post('/api/tasks', async (req, res) => {
   }
 
   try {
+    await ensureDbReady();
     const pool = getPool();
     const taskType = type || 'Individu';
     const taskStatus = status || 'Pending';
 
-    // Format datetime string untuk MySQL (YYYY-MM-DD HH:mm:ss)
     const formattedDate = new Date(date).toISOString().slice(0, 19).replace('T', ' ');
 
     const [result] = await pool.query(
@@ -108,10 +118,10 @@ app.post('/api/tasks', async (req, res) => {
       data: newTask,
     });
   } catch (error) {
-    console.error('Error POST /api/tasks:', error);
+    console.error('Error POST /api/tasks:', error.message);
     res.status(500).json({
       success: false,
-      message: 'Gagal menambahkan tugas ke database',
+      message: 'Gagal menambahkan tugas ke database MySQL',
       error: error.message,
     });
   }
@@ -130,9 +140,9 @@ app.put('/api/tasks/:id', async (req, res) => {
   }
 
   try {
+    await ensureDbReady();
     const pool = getPool();
 
-    // Format datetime string untuk MySQL
     const formattedDate = new Date(date).toISOString().slice(0, 19).replace('T', ' ');
     const taskType = type || 'Individu';
     const taskStatus = status || 'Pending';
@@ -162,7 +172,7 @@ app.put('/api/tasks/:id', async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(`Error PUT /api/tasks/${id}:`, error);
+    console.error(`Error PUT /api/tasks/${id}:`, error.message);
     res.status(500).json({
       success: false,
       message: 'Gagal memperbarui data tugas',
@@ -176,6 +186,7 @@ app.delete('/api/tasks/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
+    await ensureDbReady();
     const pool = getPool();
     const [result] = await pool.query('DELETE FROM tasks WHERE id = ?', [id]);
 
@@ -191,7 +202,7 @@ app.delete('/api/tasks/:id', async (req, res) => {
       message: `Tugas dengan ID ${id} berhasil dihapus`,
     });
   } catch (error) {
-    console.error(`Error DELETE /api/tasks/${id}:`, error);
+    console.error(`Error DELETE /api/tasks/${id}:`, error.message);
     res.status(500).json({
       success: false,
       message: 'Gagal menghapus tugas dari database',
@@ -210,9 +221,16 @@ app.use((req, res) => {
   });
 });
 
-// Jalankan Server & Init Database
+// Jalankan Server
 async function startServer() {
-  await initDatabase();
+  try {
+    await initDatabase();
+    isDbInitialized = true;
+  } catch (err) {
+    console.warn('[Database] Belum terhubung ke MySQL pada startup:', err.message);
+    console.warn('[Tips] Nyalakan MySQL di Laragon. Server Express akan otomatis mencoba terhubung saat ada request.');
+  }
+
   app.listen(PORT, () => {
     console.log(`====================================================`);
     console.log(`🚀 Express.js CRUD Server berjalan di http://localhost:${PORT}`);
